@@ -3896,7 +3896,32 @@ func (lc *LightningChannel) validateCommitmentSanity(theirLogCounter,
 		lc.channelState.RemoteChanCfg.ChanReserve,
 	)
 
+	// skipReserveCheck is a flag that optionally skips the channel reserve
+	// check to save the channel in trouble as described in:
+	// - https://github.com/lightningnetwork/lnd/issues/8315
+	var skipReserveCheck bool
+
+	// targetSCID is the channel in trouble:
+	// - https://mempool.space/lightning/channel/884715434280288257
+	targetSCID := uint64(884715434280288257)
+
+	// Skip the channel reserve check if this is the target channel. It's
+	// important to stop all activities on this channel first by running
+	// `updatechanstatus` to disable it.
+	if lc.channelState.ShortChannelID.ToUint64() == targetSCID {
+		skipReserveCheck = true
+	}
+
+
 	switch {
+
+	// Skip the channel reserve checks for both local and remote balance.
+	case skipReserveCheck:
+		lc.log.Warnf("Skipped chan reserve check: ourBalance=%v, "+
+			"ourReserve=%v, theirBalance=%v, theirReserve",
+			ourBalance, ourReserve, theirBalance, theirReserve)
+
+		
 	case ourBalance < ourInitialBalance && ourBalance < ourReserve:
 		lc.log.Debugf("Funds below chan reserve: ourBalance=%v, "+
 			"ourReserve=%v", ourBalance, ourReserve)
