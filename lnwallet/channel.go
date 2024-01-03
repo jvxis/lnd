@@ -3902,8 +3902,8 @@ func (lc *LightningChannel) validateCommitmentSanity(theirLogCounter,
 	var skipReserveCheck bool
 
 	// targetSCID is the channel in trouble:
-	// - https://mempool.space/lightning/channel/884715434280288257
-	targetSCID := uint64(884715434280288257)
+	// - https://mempool.space/lightning/channel/884715434280288257 - st_paul and Friendspool
+	targetSCID := uint64(895575310741274624)
 
 	// Skip the channel reserve check if this is the target channel. It's
 	// important to stop all activities on this channel first by running
